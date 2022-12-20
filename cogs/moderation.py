@@ -97,6 +97,50 @@ class Moderation(commands.Cog):
         await member.send(f"Has sido baneado en **{guild}** | Razón: **{reason}**")
         await member.ban(reason=reason)
 
+
+    @nextcord.slash_command(description="🚓 - Banea al usuario del servidor seleccionado.")
+    @commands.has_permissions(ban_members=True)
+    async def ban(self, interaction: nextcord.Interaction, member: nextcord.Member = None, *, reason=None):
+    #ask name of the member in a modal
+        if member == None:
+            embed1 = nextcord.Embed(
+                color=nextcord.Color.red(),
+                description="Miembro a banear - No encontrado"
+            )
+            embed1.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed1)
+        if member.id == interaction.user.id:
+            embed69 = nextcord.Embed(
+                color=nextcord.Color.red(),
+                description="No te puedes banear a ti mismo, estúpido.",
+            )
+            embed69.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed69)
+        elif interaction.user.top_role.position < member.top_role.position:
+            em3 = nextcord.Embed(
+                color=nextcord.Color.red(),
+                description="El miembro tiene un rol **superior** a ti en la jerarquía de roles - Necesitas más permisos.",
+            )
+            em3.set_author(name=f"{interaction.client.user.name} · Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em3)
+        elif interaction.user.top_role.position == member.top_role.position:
+            em3 = nextcord.Embed(
+                color=nextcord.Color.red(),
+                description="El miembro tiene un rol **igual** a ti en la jerarquía de roles - Necesitas más permisos.",
+            )
+            em3.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em3)
+        guild = interaction.guild
+        banMsg = random.choice(ban_msg)
+        banEmbed = nextcord.Embed(
+            description=f"{member.mention} {banMsg} Razón: {reason}", color=nextcord.Color.red()
+        )
+        banEmbed.set_author(name=f"{interaction.client.user.name} · ¡Ban Completado!", icon_url=interaction.guild.icon)
+        await interaction.send(embed=banEmbed)
+        await member.send(f"Has sido baneado en **{guild}** | Razón: **{reason}**")
+        await member.ban(reason=reason)
+
+
     @ban.error
     async def ban_error(self, ctx, error):
         if isinstance(error, errors.MissingPermissions):
@@ -115,6 +159,17 @@ class Moderation(commands.Cog):
         em = nextcord.Embed(description=f"Has desbaneado a <@{id}>")
         em.set_author(name=f"{ctx.bot.user.name} · ¡Desbaneo completado!", icon_url=ctx.guild.icon)
         await ctx.send(embed=em)
+    
+
+    @nextcord.slash_command(description="🆓 - Desbanea un usuario por ID")
+    @commands.has_permissions(ban_members=True)
+    async def unban(self, interaction: nextcord.Interaction, id: int):
+        user = await self.client.fetch_user(id)
+        await interaction.guild.unban(user)
+        em = nextcord.Embed(description=f"Has desbaneado a <@{id}>")
+        em.set_author(name=f"{interaction.client.user.name} · ¡Desbaneo completado!", icon_url=interaction.guild.icon)
+        await interaction.send(embed=em)
+
 
     @unban.error
     async def unban_error(self, ctx, error):
@@ -125,6 +180,7 @@ class Moderation(commands.Cog):
             )
             em5.set_author(name=f"{ctx.bot.user.name} · ¡Error! ", icon_url=ctx.guild.icon)
             return await ctx.send(embed=em5)
+        
 
     @commands.command(help="🚪 - Kickea al miembro de tu servidor.")
     @commands.has_permissions(kick_members=True)
@@ -174,6 +230,56 @@ class Moderation(commands.Cog):
         await ctx.send(embed=kickEmbed)
         await member.send(f"Se te ha expulsado de **{guild}** | Razón: **{reason}**")
         await member.kick(reason=reason)
+        
+    @nextcord.slash_command(description="🚪 - Kickea al miembro de tu servidor.")
+    @commands.has_permissions(kick_members=True)
+    async def kick(self, interaction: nextcord.Interaction, member: nextcord.Member = None, *, reason=None):
+        if member == None:
+            embed1 = nextcord.Embed(
+                color=nextcord.Color.random(),
+                description="Miembro a banear - No encontrado."
+            )
+            embed1.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed1)
+        if not (interaction.guild.me.guild_permissions.kick_members):
+            embed2 = nextcord.Embed(
+                color=nextcord.Color.random(),
+                description="Necesito el permiso ``Kick Members`` para usar este comando - Faltan permisos.",
+            )
+            embed2.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed2)
+        if member.id == interaction.user.id:
+            embed69 = nextcord.Embed(
+                color=nextcord.Color.random(),
+                description="Lamentablemente no puedes expulsarte a ti mismo...",
+            )
+            embed69.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed69)
+        elif interaction.user.top_role.position < member.top_role.position:
+            em3 = nextcord.Embed(
+                color=nextcord.Color.random(),
+                description="El miembro tiene un rol **superior** a ti en la jerarquía de roles - Necesitas más permisos.",
+            )
+            em3.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em3)
+        elif interaction.user.top_role.position == member.top_role.position:
+            em4 = nextcord.Embed(
+                color=nextcord.Color.random(),
+                description="El miembro tiene un rol **igual** a ti en la jerarquía de roles - Necesitas más permisos."
+            )
+            em4.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em4)
+        guild = interaction.guild
+        kickMsg = random.choice(kick_msg)
+        kickEmbed = nextcord.Embed(
+            color=nextcord.Color.random(),
+            description=f"{member.mention} {kickMsg} **Razón:** {reason}"
+        )
+        kickEmbed.set_author(name=f"{interaction.client.user.name} · ¡Kick completado! ", icon_url=interaction.guild.icon)
+        await interaction.send(embed=kickEmbed)
+        await member.send(f"Se te ha expulsado de **{guild}** | Razón: **{reason}**")
+        await member.kick(reason=reason)
+
 
     @kick.error
     async def kick_error(self, ctx, error):
@@ -203,6 +309,25 @@ class Moderation(commands.Cog):
             msg.set_author(name=f"{ctx.bot.user.name} · ¡Limpieza completada! ", icon_url=ctx.guild.icon)
             msg.set_footer(text=f"Limpieza solicitada por {ctx.author}")
             await ctx.send(embed=msg)
+
+    @nextcord.slash_command(name="clear", description="🗑️ - Borra un bloque de mensajes.")
+    @commands.has_permissions(manage_messages=True)
+    async def clear_slash(self, interaction: nextcord.Interaction, amount: int):
+        amount = amount + 1
+        if amount > 101:
+            em1 = nextcord.Embed(
+                description="Has superado el límite - Más de 100 mensajes.",
+            )
+            em1.set_author(name=f"{interaction.client.user.name} · ¡Error! ", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em1, ephemeral=True)
+        else:
+            await interaction.channel.purge(limit=amount)
+            msg = nextcord.Embed(
+            )
+            msg.set_author(name=f"{interaction.client.user.name} · ¡Limpieza completada! ", icon_url=interaction.guild.icon)
+            msg.set_footer(text=f"Limpieza solicitada por {interaction.user}")
+            await interaction.send(embed=msg)
+
 
     @clear.error
     async def clear_error(self, ctx, error):
@@ -242,7 +367,36 @@ class Moderation(commands.Cog):
         except Exception:
             await ctx.send("Ha ocurrido un error, avisa al equipo de desarrollo.")
             print(Exception)
-
+            
+    @nextcord.slash_command(name="slowmode", description="🐢 - Cambia el canal a modo lento.")
+    @commands.has_permissions(manage_channels=True)
+    async def slowmode_slash(self, interaction: nextcord.Interaction, time: int):
+        try:
+            if time == 0:
+                em1 = nextcord.Embed(
+                    description="Modo lento desactivado."
+                )
+                em1.set_author(name=f"{interaction.client.user.name} · Modo lento.", icon_url=interaction.guild.icon)
+                await interaction.send(embed=em1, ephemeral=True)
+                await interaction.channel.edit(slowmode_delay=0)
+            elif time > 21600:
+                em2 = nextcord.Embed(
+                    description="Modo lento de más de 6 horas."
+                )
+                em2.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+                await interaction.send(embed=em2, ephemeral=True)
+            else:   
+                await interaction.channel.edit(slowmode_delay=time)
+                em3 = nextcord.Embed(
+                    description=f"El modo lento se ha habilitado con {time} segundos.",
+                )
+                em3.set_author(name=f"{interaction.client.user.name} · Modo lento.", icon_url=interaction.guild.icon)
+                await interaction.send(embed=em3, ephemeral=True)
+        except Exception:   
+            await interaction.send("Ha ocurrido un error, avisa al equipo de desarrollo.", ephemeral=True)
+            print(Exception)
+    
+    
     @slowmode.error
     async def slowmode_error(self, ctx, error):
         if isinstance(error, errors.MissingPermissions):
@@ -309,6 +463,62 @@ class Moderation(commands.Cog):
                 return
         except Exception:
             print(Exception)
+            
+    @nextcord.slash_command(name="addrole", description="➕ - Le da a un miembro un rol concreto.")
+    @commands.has_permissions(manage_roles=True)
+    async def addrole_slash(self, interaction: nextcord.Interaction, member: nextcord.Member = None, *, role: nextcord.Role = None):
+        if member is None:
+            embed = nextcord.Embed(
+                description="¡Por favor menciona a un usuario para darle un rol!",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            await interaction.send(embed=embed, ephemeral=True)
+            return
+        if role is None:
+            embed = nextcord.Embed(
+                description="¡Por favor menciona un rol para darle a {}!".format(
+                    member.mention
+                ),
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            await interaction.send(embed=embed, ephemeral=True)
+            return
+        if interaction.user.top_role.position < role.position:
+            em = nextcord.Embed(
+                description="No tienes suficientes permisos para dar ese rol.",
+            )
+            em.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em, ephemeral=True)
+        if interaction.guild.me.top_role.position < role.position:
+            embed = nextcord.Embed(
+                description="Ese rol es muy alto en la jerarquía para poder darlo.",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed, ephemeral=True)
+        try:
+            addRole = True
+            for role_ in member.roles:
+                if role_ == role:
+                    addRole = False
+                    break
+            if not addRole:
+                embed = nextcord.Embed(
+                    description=f"{member.mention} ya tiene ese rol que intentar darle.",
+                )
+                embed.set_author(name=f"{interaction.client.user.name} · Error!", icon_url=interaction.guild.icon)
+                await interaction.send(embed=embed, ephemeral=True)
+                return
+            else:
+                em = nextcord.Embed(
+                    description=f"{member.mention} ha recibido el rol {role.mention}",
+                )
+                em.set_author(name=f"{interaction.client.user.name} · ¡Rol añadido!", icon_url=interaction.guild.icon)
+                await interaction.send(embed=em, ephemeral=True)
+                await member.add_roles(role)
+                return
+        except Exception:
+            print(Exception)
+
 
     @addrole.error
     async def addrole_error(self, ctx, error):
@@ -381,6 +591,62 @@ class Moderation(commands.Cog):
                 return
         except Exception:
             print(Exception)
+            
+    @nextcord.slash_command(description="➖ - Elimina un rol específico de un usuario.")
+    @commands.has_permissions(manage_roles=True)
+    async def removerole(self, interaction: nextcord.Interaction, member: nextcord.Member = None, role: nextcord.Role = None, *, reason=None):
+        if member is None:
+            embed = nextcord.Embed(
+                description="¡Por favor, menciona a un usuario para quitarle ese rol!",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            await interaction.send(embed=embed, ephemeral=True)
+            return
+        if role is None:
+            embed = nextcord.Embed(
+                description="Por favor menciona un rol para quitarle a {}!".format(
+                    member.mention
+                ),
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            await interaction.send(embed=embed, ephemeral=True)
+            return
+        if interaction.user.top_role.position < role.position:
+            em = nextcord.Embed(
+                description="No tienes suficientes permisos para quitar ese rol.",
+            )
+            em.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=em, ephemeral=True)
+        if interaction.guild.me.top_role.position < role.position:
+            embed = nextcord.Embed(
+                description="Ese rol es muy alto en la jerarquía para poder quitarlo.",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            return await interaction.send(embed=embed, ephemeral=True)
+        try:
+            roleRemoved = False
+            for role_ in member.roles:
+                if role_ == role:
+                    await member.remove_roles(role)
+                    roleRemoved = True
+                    break
+            if not roleRemoved:
+                embed = nextcord.Embed(
+                    description=f"{member.mention} ya tiene el rol que intentas entregarle.",
+                )
+                embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+                await interaction.send(embed=embed, ephemeral=True)
+                return
+            else:
+                em = nextcord.Embed(
+                    description=f"A {member.mention} se le ha quitado {role.mention}",
+                )
+                em.set_author(name=f"{interaction.client.user.name} · ¡Rol eliminado!", icon_url=interaction.guild.icon)
+                await interaction.send(embed=em, ephemeral=True)
+                return
+        except Exception:
+            print(Exception)
+    
 
     @removerole.error
     async def removerole_error(self, ctx, error):
@@ -422,7 +688,7 @@ class Moderation(commands.Cog):
             return await ctx.send(embed=em)
         else:
             time = humanfriendly.parse_timespan(time)
-            await member.edit(timeout=nextcord.utils.utcnow() + timedelta(seconds=time))
+            await member.edit(timeout=nextcord.utils.utcnow() + timedelta(minutes=time))
             await member.send(f"Has sido silenciado en {ctx.guild} | Razón: {reason}")
             embed = nextcord.Embed(
                 description=f"{member.mention} ha sido silenciado por {time}",
@@ -430,6 +696,41 @@ class Moderation(commands.Cog):
             embed.set_author(name=f"{ctx.bot.user.name} · ¡Silenciado!", icon_url=ctx.guild.icon)
             await ctx.send(embed=embed)
             return
+        
+    @nextcord.slash_command(name="mute", description="🔇 - Silencia usuarios con este comando.")
+    async def mute(self, interaction: nextcord.Interaction , member: nextcord.Member, time=None, reason=None):
+            if member == None:
+                embed = nextcord.Embed(
+                    description="¡Por favor menciona a un usuario para silenciarlo!",
+                )
+                embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+                await interaction.response.send_message(embed=embed)
+                return
+            if time == None:
+                embed = nextcord.Embed(
+                    description="¡Especifica cuanto tiempo quieres silenciarlo!",
+                )
+                embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+                await interaction.response.send_message(embed=embed)
+                return
+            if interaction.user.top_role.position < member.top_role.position:
+                em = nextcord.Embed(
+                    description="No tienes suficientes permisos para silenciar a este miembro.",
+                )
+                em.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+                await interaction.response.send_message(embed=em)
+                return
+            else:
+                time = humanfriendly.parse_timespan(time)
+                await member.edit(timeout=nextcord.utils.utcnow() + timedelta(minutes=time))
+                await member.send(f"Has sido silenciado en {interaction.guild} | Razón: {reason}")
+                embed = nextcord.Embed(
+                    description=f"{member.mention} ha sido silenciado por {time} minutos",
+                )
+                embed.set_author(name=f"{interaction.client.user.name} · ¡Silenciado!", icon_url=interaction.guild.icon)
+                await interaction.response.send_message(embed=embed)
+                return
+    
     
     @mute.error
     async def mute_error(self, ctx, error):
@@ -454,6 +755,25 @@ class Moderation(commands.Cog):
             )
             embed.set_author(name=f"{ctx.bot.user.name} · ¡Silencio eliminado!", icon_url=ctx.guild.icon)
             await ctx.send(embed=embed)
+            return
+        
+    @nextcord.slash_command(name="unmute", description="🔊 - Elimina silencios de los usuarios con este comando.")
+    async def unmute(self, interaction: nextcord.Interaction, member: nextcord.Member, reason=None):
+        if member == None:
+            embed = nextcord.Embed(
+                description="¡Especifica un usuario para quitar el silencio!",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Error!", icon_url=interaction.guild.icon)
+            await interaction.response.send_message(embed=embed)
+            return
+        else:
+            await member.edit(timeout=None)
+            await member.send(f"Tu silecio en {interaction.guild} ha sido eliminado. | Reason: {reason}")
+            embed = nextcord.Embed(
+                description=f"Se ha eliminado el silencio de {member.mention}",
+            )
+            embed.set_author(name=f"{interaction.client.user.name} · ¡Silencio eliminado!", icon_url=interaction.guild.icon)
+            await interaction.response.send_message(embed=embed)
             return
 
     @unmute.error
@@ -480,6 +800,21 @@ class Moderation(commands.Cog):
             command.enabled = not command.enabled
             ternary = "enabled" if command.enabled else "disabled"
             await ctx.send (f"The {command.qualified_name} command is now {ternary}")
+    
+    @nextcord.slash_command(name="switch", description="🎚️ - Habilita o deshabilita los comandos en este servidor.")
+    async def switch(self, interaction: nextcord.Interaction, *, command):
+        if not interaction.author.id == 200391563346575361:
+            await interaction.response.send_message("Ni lo intentes, esto es un comando de desarrollo.")
+            return
+        command = self.get_command(command)
+        if command == None:
+            await interaction.response.send_message("No se ha encontrado ese comando.")
+        elif interaction.command == command:
+            await interaction.response.send_message("No puedes desactivar este comando.")
+        else:
+            command.enabled = not command.enabled
+            ternary = "enabled" if command.enabled else "disabled"
+            await interaction.response.send_message(f"The {command.qualified_name} command is now {ternary}")
     
     
     @commands.command(help = "🚔 - Comando para que los moderadores baneen.")

@@ -229,9 +229,8 @@ class Utils(commands.Cog):
         view = CalculatorButtons(ctx.author, embed, message)
         await message.edit(content=None, embed=embed, view=view)
 
-
     @commands.command(help = "🧑‍💻 - Muestra la información de usuario.")
-    async def userinfo(self, ctx, *, user: nextcord.Member = None):  # b'\xfc'
+    async def userinfo(self, ctx, *, user: nextcord.Member = None):
         if user is None:
             user = ctx.author
         date_format = "%a, %d %b %Y %I:%M %p"
@@ -558,7 +557,90 @@ class Utils(commands.Cog):
         💬 - ``Ayudando a {len(self.client.users)} usuarios.``""", inline = False)
         info.set_footer(text="Owned by Willard Networks.")
         await ctx.reply(embed=info)
+        
+    @nextcord.slash_command(name = "ticket", description="🎫 - Abre un ticket.")
+    async def _ticket(self, interaction: nextcord.Interaction):
+        
+        #if a thread with the same name exists, send a message and return
+        if any(thread.name == f"ticket-{interaction.user.name}" for thread in interaction.channel.threads):
+            await interaction.send("Ya tienes un ticket abierto.", ephemeral=True)
+            return
+        elif interaction.channel.id == 1054111038427123842:
+            #create a thread with user name
+            thread = await interaction.channel.create_thread(name=f"ticket-{interaction.user.name}", type=nextcord.ChannelType.private_thread)
+            #send a message in the thread
+            await thread.send(f"Ticket creado por {interaction.user.mention}")
+            #send a message in the channel
+            await interaction.send(f"Ticket creado en {thread.mention}", ephemeral=True)
+            #notify admins in channel 1046191747451068517
+            await self.client.get_channel(1046191747451068517).send(f"Ticket creado por {interaction.user.mention} en {thread.mention}")
+        else:
+            await interaction.send("No puedes crear un ticket aquí, prueba en <#1054111038427123842>.", ephemeral=True)
+    
+    @nextcord.slash_command(name = "close", description="🔒 - Cierra un ticket.")
+    async def _close(self, interaction: nextcord.Interaction):
+        #if the channel is not a thread, send a message and return
+        if interaction.channel.name != f"ticket-{interaction.user.name}":
+            await interaction.send("Este no es tu ticket.", ephemeral=True)
+            return
+        else:
+            #send a message in the thread
+            await interaction.channel.send(f"Ticket cerrado por {interaction.user.mention}")
+            #delete the thread
+            await interaction.channel.delete()
+            #send a message in the channel
+            await interaction.send("Ticket cerrado.", ephemeral=True)
+            #notify admins in channel 1046191747451068517
+            await self.client.get_channel(1046191747451068517).send(f"Ticket cerrado por {interaction.user.mention} el nombre era ticket-{interaction.user.name}")
 
+        
+    @nextcord.slash_command(name = "help", description="📃 - Lista de comandos.")
+    async def _commandlist(self, interaction: nextcord.Interaction, page: str = nextcord.SlashOption(name="category", choices={"Útiles":"utl", "Moderación":"mod"})):
+        if page == "utl":
+            embedutils = nextcord.Embed(title="Comandos de WillardBot", description="Comandos útiles.", color=nextcord.Colour.random())
+            embedutils.add_field(name="💤 - AFK", value="``/afk - Avisa de que estás afk``", inline=False)
+            embedutils.add_field(name="🎵 - Spotify", value="``/spotify - Información sobre lo que escucha un usuario en Spotify.``", inline=False)
+            embedutils.add_field(name="🤳 - Avatar", value="``/avatar - Muestra el avatar de un usuario.``", inline=False)
+            embedutils.add_field(name="🌡️ - Weather", value="``/weather - Muestra la temperatura de una ciudad.``", inline=False)
+            embedutils.add_field(name="📃 - Info", value="``/info - Información general del bot.``", inline=False)
+            embedutils.add_field(name="🧑‍💻 - Userinfo", value="``/userinfo - Muestra la información de usuario.``", inline=False)
+            embedutils.add_field(name="✏️ - Eval", value="``/eval - Evalúa código. (comando de desarrollador)``", inline=False)
+            embedutils.add_field(name="📶 - Iplookup", value="``/iplookup - Muestra información sobre una IP.``", inline=False)
+            embedutils.add_field(name="📟 - Status", value="``/status - Información y estado del bot.``", inline=False)
+            embedutils.add_field(name="📈 - Channelstats", value="``/channelstats - Muestra estadísticas de un canal.``", inline=False)
+            embedutils.add_field(name="🏓 - Ping", value="``/ping - Muestra el ping del bot.``", inline=False)
+            embedutils.add_field(name="🖥️ - Serverinfo", value="``/serverinfo - Muestra información del servidor.``", inline=False)
+            embedutils.add_field(name="📇 - Calculator", value="``/calculator - Calculadora.``", inline=False)
+            embedutils.add_field(name="🗃 - Activities", value="``/activities - Muestra las actividades para realizar en grupo en discord.``", inline=False)
+            embedutils.add_field(name="🎖️ - Achievements", value="``/achievements - Muestra los logros del servidor.``", inline=False)
+            embedutils.add_field(name="📜 - Progress", value="``/progress - Muestra tu progreso en los logros del servidor.``", inline=False)
+            embedutils.add_field(name="🏆 - Leaderboard", value="``/leaderboard - Muestra el top de usuarios con más logros.``", inline=False)
+            embedutils.add_field(name="📬 - Ticket", value="``/ticket - Crea un ticket.``", inline=False)
+            embedutils.add_field(name="🔒 - Close", value="``/close - Cierra un ticket.``", inline=False)
+            embedutils.set_footer(text="Página de Útiles.")
+            await interaction.response.send_message(embed=embedutils, ephemeral=True)
+        elif page == "mod":
+            embedutils2 = nextcord.Embed(title="Comandos de WillardBot", description="Comandos de moderación.", color=nextcord.Colour.random())
+            embedutils2.add_field(name="🔨 - Ban", value="``/ban - Banea a un usuario.``", inline=False)
+            embedutils2.add_field(name="🔧 - Unban", value="``/unban - Desbanea a un usuario.``", inline=False)
+            embedutils2.add_field(name="🐢 - Slowmode", value="``/slowmode - Establece el slowmode de un canal.``", inline=False)
+            embedutils2.add_field(name="🔇 - Mute", value="``/mute - Silencia a un usuario.``", inline=False)
+            embedutils2.add_field(name="🔊 - Unmute", value="``/unmute - Quita el silencio a un usuario.``", inline=False)
+            embedutils2.add_field(name="🦵 - Kick", value="``/kick - Expulsa a un usuario.``", inline=False)
+            embedutils2.add_field(name="🗑️ - Clear", value="``/clear - Borra mensajes.``", inline=False)
+            embedutils2.add_field(name="➕ - Addrole", value="``/addrole - Añade un rol a un usuario.``", inline=False)
+            embedutils2.add_field(name="➖ - Removerole", value="``/removerole - Quita un rol a un usuario.``", inline=False)
+            embedutils2.add_field(name="🎚️ - Switch", value="``/switch - Habilita o deshabilita comandos``", inline=False)
+            embedutils2.set_footer(text="Página de Moderación.")
+            await interaction.response.send_message(embed=embedutils2, ephemeral=True)
+        else:
+            await interaction.response.send_message("Página no encontrada.", ephemeral=True)
+        
+        
+        
+            
+
+        
    
 
 def setup(client):

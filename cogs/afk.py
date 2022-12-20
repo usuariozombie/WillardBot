@@ -6,6 +6,7 @@ from nextcord import message
 from afks import afks
 from nextcord.utils import get
 
+#afk
 
 class AFK(commands.Cog):
 
@@ -19,6 +20,7 @@ class AFK(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"\u001b[32m[{datetime.now().strftime('%H:%M:%S')} COG] » AFK's enabled.\u001b[0m")
+
 
     @commands.command(help = "😴 - Cambia tu estado a AFK.")
     async def afk(self,ctx,*,reason ="No se dió una razón."):
@@ -36,6 +38,23 @@ class AFK(commands.Cog):
         embed.set_author(name=(f"{ctx.author.name} ha cambiado su estado a AFK."), icon_url=ctx.author.avatar)
         embed.set_footer(text=f"{ctx.guild.name}", icon_url=ctx.guild.icon)
         await ctx.send(embed=embed)
+    
+    
+    @nextcord.slash_command(name="afk", description="Cambia tu estado a AFK.")
+    async def _afk(self, interaction: nextcord.Interaction, *, reason: str = "No se dió una razón."):
+        member = interaction.user
+        if member.id in afks.keys():
+            afks.pop(member.id)
+        else:
+            try:
+                await member.edit(nick = f"(AFK) {member.display_name}")
+            except:
+                pass
+        afks[member.id] = reason
+        embed = nextcord.Embed(description = f"<:camera:990936513619574874>**Reason**: {reason}",color = nextcord.Color.random())
+        embed.set_author(name=(f"{interaction.user.name} ha cambiado su estado a AFK."), icon_url=interaction.user.avatar)
+        embed.set_footer(text=f"{interaction.guild.name}", icon_url=interaction.guild.icon)
+        await interaction.response.send_message(embed=embed)
 
 
     @commands.Cog.listener()

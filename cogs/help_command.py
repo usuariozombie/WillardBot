@@ -159,5 +159,7 @@ class HelpCog(commands.Cog, name="Help"):
     async def on_ready(self):
         print(f"\u001b[32m[{datetime.now().strftime('%H:%M:%S')} COG] » Help enabled.\u001b[0m")
 
+
+
 def setup(bot: commands.Bot):
     bot.add_cog(HelpCog(bot))

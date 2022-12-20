@@ -84,13 +84,13 @@ class Socials(commands.Cog, name="Actividades"):
 		print(f"\u001b[32m[{datetime.now().strftime('%H:%M:%S')} COG] » Activities enabled.\u001b[0m")
 
 
-	@commands.command(name="act", help="🗃 - Selecciona una actividad para compartir con tus amigos.")
-	async def act(self, ctx):
-		if ctx.author.voice is None:
-			await ctx.send("Debes estar en un canal de voz para usar este comando.")
+	@nextcord.slash_command(name="act", description="🗃 - Selecciona una actividad para compartir con tus amigos.")
+	async def act(self, interaction: nextcord.Interaction):
+		if interaction.user.voice is None:
+			await interaction.response.send_message("Debes estar en un canal de voz para usar este comando.", ephemeral=True)
 		else:
-			view = DropdownView(ctx.author.id, 30)
-			view.message = await ctx.send("Elige una actividad:", view=view)
+			view = DropdownView(interaction.user.id, 30)
+			view.message = await interaction.response.send_message("Elige una actividad:", view=view, ephemeral=True)
 	    
 
 def setup(client):
