@@ -1,15 +1,14 @@
 {
-	"BotToken": "ODcxMTU3OTkwODAyMjE5MDY4.G0Pcyd.NWhAu2xutQBVWWY18sjyHFgdZ9MTZmGWQpApXE",
+	"BotToken": "BotToken",
 	"CacheFolders": [
 		"__pycache__",
 		"cogs/__pycache__",
 		"tools/utils/__pycache__"
 	],
-	"OWMAPIKey": "894fa1da528feac8576e3477fc73071a",
 	"Permissions": 8,
 	"Prefix": ",",
 	"Whitelist": [
-		200391563346575361
+		"YOURID"
 	],
-    "IpKey": "yOkpVLTQgtySp0Y2Xl6S"
+    "IpKey": "IpKey"
 }
