@@ -785,7 +785,7 @@ class Utils(commands.Cog):
                 #create a thread with user name
                 thread = await interaction.channel.create_thread(name=f"ticket-{interaction.user.name}", type=nextcord.ChannelType.private_thread)
                 #send a message in the thread
-                await thread.send(f"Ticket creado por {interaction.user.mention}")
+                await thread.send(f"Ticket creado por {interaction.user.mention} -- *usa /close para cerrar el ticket cuando se resuelva tu duda*")
                 #send a message in the channel
                 await interaction.send(f"Ticket creado en {thread.mention}", ephemeral=True)
                 #notify admins in channel 1046191747451068517
@@ -848,6 +848,7 @@ class Utils(commands.Cog):
             embedutils.add_field(name="🏆 - Leaderboard", value="``/leaderboard - Muestra el top de usuarios con más logros.``", inline=False)
             embedutils.add_field(name="📬 - Ticket", value="``/ticket - Crea un ticket.``", inline=False)
             embedutils.add_field(name="🔒 - Close", value="``/close - Cierra un ticket.``", inline=False)
+            embedutils.add_field(name="ℹ️ - Ingame", value="``/ingame - Muestra información sobre el servidor de Garry's Mod``", inline=False)
             embedutils.set_footer(text="Página de Útiles.")
             await interaction.response.send_message(embed=embedutils, ephemeral=True)
         elif page == "mod":
@@ -862,6 +863,9 @@ class Utils(commands.Cog):
             embedutils2.add_field(name="➕ - Addrole", value="``/addrole - Añade un rol a un usuario.``", inline=False)
             embedutils2.add_field(name="➖ - Removerole", value="``/removerole - Quita un rol a un usuario.``", inline=False)
             embedutils2.add_field(name="🎚️ - Switch", value="``/switch - Habilita o deshabilita comandos``", inline=False)
+            embedutils2.add_field(name="❗ - Warn", value="``/warn - Avisa a un usuario.``", inline=False)
+            embedutils2.add_field(name="📋 - Warnlist", value="``/warns - Muestra los avisos de un usuario.``", inline=False)
+            embedutils2.add_field(name="📋 - Clearwarns", value="``/clearwarns - Borra los avisos de un usuario.``", inline=False)
             embedutils2.set_footer(text="Página de Moderación.")
             await interaction.response.send_message(embed=embedutils2, ephemeral=True)
         else:
